@@ -13,5 +13,14 @@ CHIP Xor {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    /** This isn't actually testing for the non
+     *  equality condition in all cases-- the 
+     *  (F, F) case will evaluate true although
+     *  they are equal, but it doesn't matter
+     *  because the (T, T) condition is the only
+     *  one we really have to guard for.
+     */
+    Nand(a=a, b=b, out=notequal);
+    Or(a=a, b=b, out=aOrb);
+    And(a=aOrb, b=notequal, out=out);
 }
