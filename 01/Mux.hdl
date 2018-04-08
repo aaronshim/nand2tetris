@@ -14,5 +14,10 @@ CHIP Mux {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    Not(in=sel, out=notS);
+    // The case that the T signal is from a.
+    And(a=a, b=notS, out=fromA);
+    // The case that the T signal is from b.
+    And(a=b, b=sel, out=fromB);
+    Or(a=fromA, b=fromB, out=out);
 }
