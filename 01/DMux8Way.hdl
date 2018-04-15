@@ -16,5 +16,11 @@ CHIP DMux8Way {
     OUT a, b, c, d, e, f, g, h;
 
     PARTS:
-    // Put your code here:
+    // Adjacency of 4 in a row: (a,b,c,d) and (e,f,g,h).
+    DMux4Way(in=in, sel=sel[0..1], a=a1, b=b1, c=c1, d=d1);
+    // Decide whether in left or right half.
+    DMux(in=a1, sel=sel[2], a=a, b=e);
+    DMux(in=b1, sel=sel[2], a=b, b=f);
+    DMux(in=c1, sel=sel[2], a=c, b=g);
+    DMux(in=d1, sel=sel[2], a=d, b=h);
 }
