@@ -42,5 +42,55 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+    /* Think of these as a pipeline where the input passes
+     * through, and at each step in the pipeline, we decide
+     * whether to let the transformed version pass or the non
+     * transformed version pass. Each "conditional" on a
+     * transformation step in the pipeline is really a mux.
+     * Also, the order in which we structure the operations of
+     * the pipeline is thankfully just as written in the comments.
+     * (None of the steps produce different results if applied in
+     * different orders, except for the no control bit and obviously
+     * the two other output bits.)
+     *
+     * Also, because circuits are declarative rather than procedural,
+     * and the electricity flows through all parts of the circuit,
+     * we end up "computing" all possible values, even if they don't
+     * get threaded through.
+     */
+    // Transform x's and y's.
+    Mux16(a=x, b=false, sel=zx, out=x1);
+    Not16(in=x1, out=notx1);
+    Mux16(a=x1, b=notx1, sel=nx, out=x2);
+    Mux16(a=y, b=false, sel=zy, out=y1);
+    Not16(in=y1, out=noty1);
+    Mux16(a=y1, b=noty1, sel=ny, out=y2);
+
+    // Compute the out.
+    Add16(a=x2, b=y2, out=addOut);
+    And16(a=x2, b=y2, out=andOut);
+    Mux16(a=andOut, b=addOut, sel=f, out=almostOut);
+
+    // Apply the final not (or not) to the out.
+    Not16(in=almostOut, out=notOut);
+    Mux16(a=almostOut, b=notOut, sel=no, out=result,
+          out[15]=isResultNegative, out=out);
+
+    // Set the final two other output bits.
+    // (Not xor is an equality comparator for one bit.)
+    // Although not(or16way(xor16(a, b))) is the generic equality comparison,
+    // since we are dealing with just comparing to 0, we can use or16 instead
+    // of xor16.
+    Or16(a=result, b=false, out[0..7]=outNotZero1, out[8..15]=outNotZero2);
+    Or8Way(in=outNotZero1, out=outNotZeroBit1);
+    Or8Way(in=outNotZero2, out=outNotZeroBit2);
+    Or(a=outNotZeroBit1, b=outNotZeroBit2, out=outNotZeroBit);
+    Mux(a=true, b=false, sel=outNotZeroBit, out=zr);
+   
+    //And(a=result[15], b=true, out=outIsLessThanZeroBit);
+    Mux(a=false, b=true, sel=isResultNegative, out=ng);
+
+    // And a bookkeeping trick to make sure out is routed out.
+    //And16(a=result, b=true, out=out);
+
 }
