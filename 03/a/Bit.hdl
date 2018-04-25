@@ -14,5 +14,8 @@ CHIP Bit {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    // Have to use an internal pin to avoid looping the out pin.
+    Mux(a=internalLoop, b=in, sel=load, out=flipFlopIn);
+    // The built-in DFF flip flop is clocked, so this is clocked.
+    DFF(in=flipFlopIn, out=internalLoop, out=out);
 }

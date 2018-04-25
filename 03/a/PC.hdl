@@ -16,5 +16,11 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Inc16(in=internalPin, out=addOne);
+    // reset takes prescedence over load takes prescendence over inc.
+    Mux16(a=internalPin, b=addOne, sel=inc, out=loadInput);
+    Mux16(a=loadInput, b=in, sel=load, out=loadInput1);
+    Mux16(a=loadInput1, b=false, sel=reset, out=loadInput2);
+    // Always overwrite because if nothing just the old output is fed back.
+    Register(in=loadInput2, load=true, out=internalPin, out=out);
 }
