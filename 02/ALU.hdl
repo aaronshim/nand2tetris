@@ -72,11 +72,12 @@ CHIP ALU {
     Mux16(a=andOut, b=addOut, sel=f, out=almostOut);
 
     // Apply the final not (or not) to the out.
+    // (We get ng, whether the output is negative, for free.)
     Not16(in=almostOut, out=notOut);
     Mux16(a=almostOut, b=notOut, sel=no, out=result,
-          out[15]=isResultNegative, out=out);
+          out[15]=ng, out=out);
 
-    // Set the final two other output bits.
+    // Set the final zr (zero) bit.
     // (Not xor is an equality comparator for one bit.)
     // Although not(or16way(xor16(a, b))) is the generic equality comparison,
     // since we are dealing with just comparing to 0, we can use or16 instead
@@ -85,12 +86,5 @@ CHIP ALU {
     Or8Way(in=outNotZero1, out=outNotZeroBit1);
     Or8Way(in=outNotZero2, out=outNotZeroBit2);
     Or(a=outNotZeroBit1, b=outNotZeroBit2, out=outNotZeroBit);
-    Mux(a=true, b=false, sel=outNotZeroBit, out=zr);
-   
-    //And(a=result[15], b=true, out=outIsLessThanZeroBit);
-    Mux(a=false, b=true, sel=isResultNegative, out=ng);
-
-    // And a bookkeeping trick to make sure out is routed out.
-    //And16(a=result, b=true, out=out);
-
+    Not(in=outNotZeroBit, out=zr);
 }
