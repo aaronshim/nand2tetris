@@ -19,7 +19,7 @@
 //   goto LOOP
 //
 // STOP
-//   R2 = if R1 > 0 then -accm else accm
+//   R2 = if R1 > 0 then accm else -accm
 //
 // END
 //   goto END
@@ -67,7 +67,7 @@ M=-D
   0; JMP
 
 (STOP)
-  // R2 = if R1 > 0 then -accm else accm
+  // R2 = if R1 > 0 then accm else -accm
   @accm
   D=M
   @R2
